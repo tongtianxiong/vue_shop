@@ -3,17 +3,29 @@
     <div class="login_box">
       <!-- 头像区域 -->
       <div class="avatar_box">
-        <img src="../assets/logo.png" alt="" />
+        <img src="../assets/logo.png" alt />
       </div>
       <!-- 登录表单区域 -->
-      <el-form ref="loginFormRef" class="login_form" :model="loginForm" :rules="loginFormRules">
+      <el-form
+        ref="loginFormRef"
+        class="login_form"
+        :model="loginForm"
+        :rules="loginFormRules"
+      >
         <!-- 用户名 -->
         <el-form-item prop="username">
-          <el-input v-model="loginForm.username" prefix-icon="iconfont icon-user"></el-input>
+          <el-input
+            v-model="loginForm.username"
+            prefix-icon="iconfont icon-user"
+          ></el-input>
         </el-form-item>
         <!-- 密码 -->
         <el-form-item prop="password">
-          <el-input v-model="loginForm.password" prefix-icon="iconfont icon-3702mima" type="password"></el-input>
+          <el-input
+            v-model="loginForm.password"
+            prefix-icon="iconfont icon-3702mima"
+            type="password"
+          ></el-input>
         </el-form-item>
         <!-- 按钮 -->
         <el-form-item class="btns">
@@ -72,8 +84,18 @@ export default {
       this.$refs.loginFormRef.resetFields()
     },
     login() {
-      this.$refs.loginFormRef.validate((valid) => {
-        console.log(valid)
+      // this.$refs.loginFormRef.validate((valid) => {
+      //   // console.log(valid)
+      // })
+      this.$refs.loginFormRef.validate(async valid => {
+        // 验证失败就直接返回
+        if (!valid) return
+        const { data: res } = await this.$http.post('login', this.loginForm)
+        if (res.meta.status !== 200) return this.$message.error('登录失败')
+        this.$message.success('登录成功')
+        // 存储 token
+        window.sessionStorage.setItem('token', res.data.token)
+        this.$router.push('/home')
       })
     }
   }
