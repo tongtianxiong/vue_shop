@@ -39,7 +39,7 @@
             </template>
             <!-- 二级菜单 -->
             <el-menu-item
-              :index="'/'+subItem.path"
+              :index="'/' + subItem.path"
               v-for="subItem in item.children"
               :key="subItem.id"
               @click="saveNavState('/' + subItem.path)"
@@ -64,6 +64,7 @@
 </template>
 
 <script>
+import hub from '../utils/hub.js'
 export default {
   data() {
     return {
@@ -85,6 +86,8 @@ export default {
     this.getMenuList()
     // 刷新的时候去 sessionStorage 里面去取
     this.activePath = window.sessionStorage.getItem('activePath')
+    // 定义一个事件监听，事件监听里面做 2 件事情，改变 activePath 和 本地的 sessionStorage
+    hub.$on('saveNavState', this.saveNavState)
   },
   methods: {
     logout() {
@@ -105,6 +108,10 @@ export default {
       window.sessionStorage.setItem('activePath', activePath)
       this.activePath = activePath
     }
+  },
+  beforeDestroy() {
+    // 移除事件监听，防止监听多次
+    hub.$off('saveNavState')
   }
 }
 </script>
